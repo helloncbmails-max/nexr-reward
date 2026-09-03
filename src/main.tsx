@@ -65,6 +65,8 @@ const [isVerifying, setIsVerifying] = useState(true);
       setTelegramUser(data.user);
 console.log("Verified Nexr user:", data.user);
 
+setMessage("Telegram verified. Syncing Nexr account...");
+
 // Sync verified Telegram user with Nexr database
 const syncResponse = await fetch("/.netlify/functions/sync-nexr-user", {
   method: "POST",
