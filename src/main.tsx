@@ -63,9 +63,33 @@ const [isVerifying, setIsVerifying] = useState(true);
       }
 
       setTelegramUser(data.user);
-      console.log("Verified Nexr user:", data.user);
+console.log("Verified Nexr user:", data.user);
 
-      setIsVerifying(false);
+// Sync verified Telegram user with Nexr database
+const syncResponse = await fetch("/.netlify/functions/sync-nexr-user", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    telegram_id: data.user.telegram_id,
+    username: data.user.username,
+    first_name: data.user.first_name
+  })
+});
+
+const syncData = await syncResponse.json();
+
+if (!syncResponse.ok || !syncData.success) {
+  console.error("Nexr database sync failed:", syncData);
+  setMessage("Unable to create Nexr account");
+  setIsVerifying(false);
+  return;
+}
+
+console.log("Nexr account synced:", syncData);
+
+setIsVerifying(false);
     } catch (error) {
       console.error("Telegram connection error:", error);
       setMessage("Telegram connection error");
