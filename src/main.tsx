@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -15,8 +15,68 @@ function App() {
   const [balance, setBalance] = useState(57339);
   const [ad, setAd] = useState(0);
   const [message, setMessage] = useState("");
+   
+  const [telegramUser, setTelegramUser] = useState<{
+  telegram_id: number;
+  username: string | null;
+  first_name: string | null;
+} | null>(null);
 
-  function watchAd() {
+const [isVerifying, setIsVerifying] = useState(true);
+  
+ useEffect(() => {
+  async function verifyTelegramUser() {
+    try {
+      const telegram = (window as any).Telegram?.WebApp;
+
+      if (!telegram) {
+        console.log("Nexr opened outside Telegram");
+        setIsVerifying(false);
+        return;
+      }
+
+      telegram.ready();
+
+      if (!telegram.initData) {
+        console.log("Telegram authentication data unavailable");
+        setIsVerifying(false);
+        return;
+      }
+
+      const response = await fetch("/.netlify/functions/verify-telegram", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          initData: telegram.initData
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.verified) {
+        console.error("Telegram verification failed:", data);
+        setMessage("Unable to verify Telegram account");
+        setIsVerifying(false);
+        return;
+      }
+
+      setTelegramUser(data.user);
+      console.log("Verified Nexr user:", data.user);
+
+      setIsVerifying(false);
+    } catch (error) {
+      console.error("Telegram connection error:", error);
+      setMessage("Telegram connection error");
+      setIsVerifying(false);
+    }
+  }
+
+  verifyTelegramUser();
+}, []);
+
+ function watchAd() {
     setMessage("Verifying sponsored ad...");
 
     setTimeout(() => {
