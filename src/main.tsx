@@ -43,7 +43,7 @@ const [isVerifying, setIsVerifying] = useState(true);
         return;
       }
 
-      const response = await fetch("/.netlify/functions/verify-telegram", {
+      const response = await fetch("/api/verify-telegram", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
