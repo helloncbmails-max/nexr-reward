@@ -39,7 +39,8 @@ const [isVerifying, setIsVerifying] = useState(true);
       telegram.ready();
 
       if (!telegram.initData) {
-        console.log("Telegram authentication data unavailable");
+  console.log("Telegram authentication data unavailable");
+  setMessage("Telegram authentication data is unavailable");
         setIsVerifying(false);
         return;
       }
