@@ -45,10 +45,11 @@ function verifyTelegramInitData(initData: string, botToken: string) {
 
   // Reject authentication data older than 24 hours.
   const now = Math.floor(Date.now() / 1000);
+const age = now - authDate;
 
-  if (now - authDate > 86400) {
-    throw new Error("Telegram authentication data expired");
-  }
+if (age < -60 || age > 86400) {
+  throw new Error("Telegram authentication data expired");
+}
 
   const userData = params.get("user");
 
