@@ -30,7 +30,8 @@ const [isVerifying, setIsVerifying] = useState(true);
       const telegram = (window as any).Telegram?.WebApp;
 
       if (!telegram) {
-        console.log("Nexr opened outside Telegram");
+  console.log("Nexr opened outside Telegram");
+  setMessage("Telegram WebApp was not detected");
         setIsVerifying(false);
         return;
       }
