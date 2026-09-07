@@ -76,10 +76,8 @@ const syncResponse = await fetch("/api/sync-nexr-user", {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    telegram_id: data.user.telegram_id,
-    username: data.user.username,
-    first_name: data.user.first_name
-  })
+  initData: telegram.initData
+})
 });
 
 const syncData = await syncResponse.json();
