@@ -59,7 +59,9 @@ const [isVerifying, setIsVerifying] = useState(true);
 
       if (!response.ok || !data.verified) {
         console.error("Telegram verification failed:", data);
-        setMessage("Unable to verify Telegram account");
+        setMessage(
+  data.error || "Unable to verify Telegram account"
+);
         setIsVerifying(false);
         return;
       }
