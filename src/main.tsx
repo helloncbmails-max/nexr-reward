@@ -82,12 +82,9 @@ const syncResponse = await fetch("/api/sync-nexr-user", {
 
 const syncData = await syncResponse.json();
 
-if (!syncResponse.ok || !syncData.success) {
-  console.error("Nexr database sync failed:", syncData);
-  setMessage("Unable to create Nexr account");
-  setIsVerifying(false);
-  return;
-}
+setMessage(
+  syncData.error || "Unable to create Nexr account"
+);
 
 console.log("Nexr account synced:", syncData);
 
