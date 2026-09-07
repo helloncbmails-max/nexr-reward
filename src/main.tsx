@@ -90,10 +90,6 @@ console.log("Nexr account synced:", syncData);
 
 setMessage("Nexr account successfully updated!");
 
-setTimeout(() => {
-  setMessage("");
-}, 3000);
-
 setIsVerifying(false);
     } catch (error) {
       console.error("Telegram connection error:", error);
