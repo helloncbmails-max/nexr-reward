@@ -82,18 +82,34 @@ const syncResponse = await fetch("/api/sync-nexr-user", {
 })
 });
 
-const syncData = await syncResponse.json();
+// Get the verified user's Nexr account
+const accountResponse = await fetch("/api/get-nexr-account", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    initData: telegram.initData
+  })
+});
 
-if (!syncResponse.ok || !syncData.success) {
-  console.error("Nexr database sync failed:", syncData);
+const accountData = await accountResponse.json();
+
+if (!accountResponse.ok || !accountData.success) {
+  console.error("Nexr account fetch failed:", accountData);
 
   setMessage(
-    syncData.error || "Unable to create Nexr account"
+    accountData.error || "Unable to load Nexr account"
   );
 
   setIsVerifying(false);
   return;
 }
+
+// Load the real balance from Supabase
+setBalance(accountData.balance);
+
+console.log("Nexr account loaded:", accountData);
 
 console.log("Nexr account synced:", syncData);
 
