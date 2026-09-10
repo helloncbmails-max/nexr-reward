@@ -1,115 +1,255 @@
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  color: #f5f7fa;
+  background: #08090c;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
 * {
   box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#root {
   margin: 0;
-  background: #07111f;
-  color: #eef5ff;
-  font-family: Arial, sans-serif;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(214, 179, 106, 0.10), transparent 35%),
+    #08090c;
+  color: #f5f7fa;
+}
+
+button {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app {
-  max-width: 520px;
+  width: 100%;
+  max-width: 560px;
   min-height: 100vh;
-  margin: auto;
-  padding-bottom: 85px;
-  background: linear-gradient(180deg, #09182b, #07111f);
+  margin: 0 auto;
+  padding: 18px 16px 110px;
+  position: relative;
+  overflow: hidden;
 }
+
+/* =========================
+   TOP BAR
+========================= */
 
 .topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #17283c;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding: 4px 2px;
 }
 
 .brand {
-  font-size: 23px;
-  font-weight: 900;
-  letter-spacing: 5px;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  color: #f5f7fa;
 }
 
 .subtitle {
-  margin-top: 3px;
-  color: #7f96b2;
+  margin-top: 5px;
+  color: #7f8795;
   font-size: 9px;
-  letter-spacing: 2px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
 }
 
 .status {
   padding: 7px 10px;
-  border: 1px solid #245c43;
-  border-radius: 20px;
-  color: #71e2a4;
-  font-size: 10px;
+  border: 1px solid rgba(214, 179, 106, 0.25);
+  border-radius: 999px;
+  background: rgba(214, 179, 106, 0.07);
+  color: #d6b36a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
 }
 
+/* =========================
+   MAIN
+========================= */
+
 main {
-  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .card {
-  margin-bottom: 14px;
-  padding: 18px;
-  border: 1px solid #1a3048;
-  border-radius: 18px;
-  background: #0d1d31;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018)
+    ),
+    #101218;
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
+/* =========================
+   HERO BALANCE
+========================= */
+
 .hero {
-  background: radial-gradient(
-    circle at 90% 10%,
-    #163b58,
-    #0d1d31 55%
-  );
+  padding: 25px;
+  min-height: 235px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  right: -100px;
+  top: -120px;
+  border-radius: 50%;
+  background: rgba(214, 179, 106, 0.12);
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  left: -100px;
+  bottom: -110px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.025);
+  pointer-events: none;
 }
 
 .label {
-  color: #7f96b2;
+  display: block;
+  color: #818997;
   font-size: 10px;
-  letter-spacing: 1.5px;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .balance {
-  margin-top: 8px;
-  font-size: 38px;
-  font-weight: 900;
+  margin: 12px 0 2px;
+  font-size: clamp(38px, 10vw, 56px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  color: #f7f8fa;
+  position: relative;
+  z-index: 1;
 }
 
 .balance small {
-  color: #79a3c9;
+  color: #d6b36a;
   font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
 }
 
-p {
-  color: #8299b4;
-  font-size: 13px;
-  line-height: 1.5;
+.hero p,
+.card p {
+  margin: 7px 0 0;
+  color: #777f8d;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  border: 0;
+  cursor: pointer;
 }
 
 .actions {
   display: flex;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
-button {
-  padding: 12px 16px;
-  border: 0;
-  border-radius: 11px;
-  background: #eaf4ff;
-  color: #07111f;
-  font-weight: 800;
-  cursor: pointer;
+.actions button,
+.card > button,
+.adCard button,
+.task button {
+  min-height: 45px;
+  padding: 0 17px;
+  border-radius: 13px;
+  background: #d6b36a;
+  color: #0a0b0e;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.actions button {
+  flex: 1;
+}
+
+.actions button:hover,
+.card > button:hover,
+.adCard button:hover,
+.task button:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 25px rgba(214, 179, 106, 0.12);
+}
+
+.actions button:active,
+.card > button:active,
+.adCard button:active,
+.task button:active {
+  transform: scale(0.97);
 }
 
 button.secondary {
-  border: 1px solid #25415e;
-  background: #13283f;
-  color: #dceaff;
+  background: rgba(255, 255, 255, 0.045);
+  color: #e9ecf0;
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
+
+button.full {
+  width: 100%;
+}
+
+/* =========================
+   STAT CARDS
+========================= */
 
 .stats {
   display: grid;
@@ -118,237 +258,420 @@ button.secondary {
 }
 
 .stat {
-  margin: 0;
-  padding: 14px;
+  padding: 17px 12px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat strong {
-  display: block;
   font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .stat span {
-  color: #8197b1;
-  font-size: 10px;
+  margin-top: 6px;
+  color: #777f8d;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
+
+/* =========================
+   SECTION HEADERS
+========================= */
 
 .sectionHead {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card:not(.hero) {
+  padding: 20px;
 }
 
 .sectionHead h2 {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
 }
 
 .sectionHead span {
-  color: #7fe4a7;
-  font-size: 10px;
+  color: #d6b36a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
 }
 
+/* =========================
+   MARKET
+========================= */
+
 .price {
-  margin-top: 14px;
+  margin-top: 20px;
   font-size: 30px;
-  font-weight: 900;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
 .chart {
+  height: 125px;
+  margin: 20px 0;
+  padding: 10px 3px;
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   gap: 5px;
-  height: 100px;
-  margin: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+}
+
+.chart::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 24%,
+      rgba(255, 255, 255, 0.035) 25%,
+      transparent 26%,
+      transparent 49%,
+      rgba(255, 255, 255, 0.035) 50%,
+      transparent 51%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.035) 75%,
+      transparent 76%
+    );
+  pointer-events: none;
 }
 
 .chart i {
-  display: block;
   flex: 1;
-  min-height: 8px;
-  border-radius: 5px 5px 2px 2px;
-  background: #4380a7;
+  min-width: 4px;
+  border-radius: 999px 999px 2px 2px;
+  background: linear-gradient(
+    to top,
+    rgba(214, 179, 106, 0.25),
+    rgba(214, 179, 106, 0.95)
+  );
+  position: relative;
+  z-index: 1;
 }
 
-.full {
-  width: 100%;
-}
+/* =========================
+   PAGE TITLES
+========================= */
 
 .pageTitle {
-  margin: 6px 2px 18px;
+  padding: 6px 3px 10px;
 }
 
 .pageTitle span {
-  color: #7391ad;
-  font-size: 11px;
-  letter-spacing: 2px;
+  color: #d6b36a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .pageTitle h1 {
-  margin: 4px 0;
-  font-size: 30px;
+  margin: 5px 0 0;
+  font-size: 31px;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
 }
+
+/* =========================
+   EARN
+========================= */
 
 .adCard {
   display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 14px;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
   align-items: center;
 }
 
 .adIcon {
+  width: 48px;
+  height: 48px;
   display: grid;
-  width: 52px;
-  height: 52px;
   place-items: center;
-  border-radius: 14px;
-  background: #16334c;
-  font-size: 20px;
+  border-radius: 15px;
+  background: rgba(214, 179, 106, 0.09);
+  border: 1px solid rgba(214, 179, 106, 0.18);
+  color: #d6b36a;
+  font-size: 18px;
 }
 
 .adCard h2,
 .task h2 {
-  margin: 5px 0;
+  margin: 5px 0 0;
   font-size: 16px;
 }
 
-.adCard strong {
-  grid-column: 2;
+.adCard p {
+  margin-top: 3px;
 }
 
-.adCard button {
+.adCard > strong {
+  grid-column: 1 / -1;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  color: #d6b36a;
+  font-size: 20px;
+}
+
+.adCard > button {
   grid-column: 1 / -1;
   width: 100%;
 }
 
+/* =========================
+   PROGRESS
+========================= */
+
 .progress {
-  height: 8px;
-  margin: 15px 0;
+  height: 7px;
+  margin: 18px 0 13px;
   overflow: hidden;
   border-radius: 99px;
-  background: #152a40;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .progress i {
   display: block;
   height: 100%;
-  background: #70d8a2;
+  border-radius: inherit;
+  background: #d6b36a;
 }
+
+/* =========================
+   CHECK-IN
+========================= */
 
 .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
-  margin-top: 15px;
+  margin-top: 18px;
 }
 
 .days div {
   padding: 9px 3px;
   border-radius: 10px;
-  background: #13283f;
-  color: #7f96b2;
-  font-size: 9px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #777f8d;
   text-align: center;
+  font-size: 9px;
+  font-weight: 750;
 }
 
 .days b {
   display: block;
-  margin-top: 4px;
-  color: #eaf4ff;
+  margin-top: 7px;
+  color: #d6b36a;
+  font-size: 11px;
 }
+
+/* =========================
+   TASKS
+========================= */
 
 .task {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
+  gap: 14px;
 }
 
 .task strong {
-  align-self: center;
+  color: #d6b36a;
+  font-size: 20px;
 }
 
 .task button {
-  grid-column: 1 / -1;
+  width: 100%;
 }
 
+/* =========================
+   REFERRAL
+========================= */
+
 .referral {
-  margin: 10px 0;
-  padding: 13px;
-  overflow: auto;
-  border: 1px dashed #2b4965;
-  border-radius: 10px;
-  background: #07111f;
-  font-size: 12px;
+  margin: 15px 0;
+  padding: 14px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  color: #aeb5c0;
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
+
+/* =========================
+   WALLET
+========================= */
 
 .ledger {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 13px 0;
-  border-bottom: 1px solid #1a3048;
+  gap: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ledger:last-child {
   border-bottom: 0;
 }
 
-.ledger span {
-  color: #7189a4;
-  font-size: 11px;
+.ledger strong {
+  color: #d6b36a;
+  font-size: 14px;
 }
+
+.ledger span {
+  color: #777f8d;
+  font-size: 10px;
+  text-align: right;
+}
+
+/* =========================
+   TOAST
+========================= */
 
 .toast {
   position: fixed;
-  bottom: 90px;
   left: 50%;
-  z-index: 10;
-  max-width: 90%;
-  padding: 12px 16px;
+  bottom: 84px;
+  z-index: 50;
+  width: calc(100% - 32px);
+  max-width: 528px;
   transform: translateX(-50%);
-  border-radius: 12px;
-  background: #eaf4ff;
-  color: #07111f;
-  font-size: 12px;
-  font-weight: 800;
+  padding: 13px 16px;
+  border: 1px solid rgba(214, 179, 106, 0.22);
+  border-radius: 14px;
+  background: rgba(16, 18, 24, 0.94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  color: #e9ecf0;
+  font-size: 11px;
+  font-weight: 700;
   text-align: center;
+  animation: toastIn 0.22s ease-out;
 }
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
 
 nav {
   position: fixed;
-  bottom: 0;
   left: 50%;
-  z-index: 5;
-  display: grid;
-  width: min(520px, 100%);
-  height: 70px;
-  grid-template-columns: repeat(5, 1fr);
+  bottom: 10px;
+  z-index: 40;
+  width: min(calc(100% - 20px), 540px);
   transform: translateX(-50%);
-  border-top: 1px solid #193049;
-  background: #09182b;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(12, 14, 19, 0.91);
+  backdrop-filter: blur(22px);
+  box-shadow:
+    0 15px 45px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 nav button {
-  padding: 8px 2px;
-  border-radius: 0;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 14px;
   background: transparent;
-  color: #6e87a2;
-  font-size: 10px;
+  color: #68717f;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
 }
 
 nav button span {
-  display: block;
-  margin-bottom: 3px;
-  font-size: 19px;
+  font-size: 17px;
+  line-height: 1;
 }
 
 nav button.active {
-  color: #eef5ff;
+  background: rgba(214, 179, 106, 0.09);
+  color: #d6b36a;
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 footer {
-  padding: 10px 20px;
-  color: #526b84;
+  margin: 22px 5px 0;
+  color: #555d69;
   font-size: 9px;
+  line-height: 1.5;
   text-align: center;
+}
+
+/* =========================
+   MOBILE POLISH
+========================= */
+
+@media (max-width: 380px) {
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hero {
+    padding: 21px;
+  }
+
+  .balance {
+    font-size: 36px;
+  }
+
+  .stats {
+    gap: 7px;
+  }
+
+  .stat {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .stat strong {
+    font-size: 16px;
+  }
 }
