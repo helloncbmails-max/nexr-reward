@@ -47,19 +47,37 @@ export default async function handler(req: any, res: any) {
       .update(botToken)
       .digest();
 
-const calculatedHash = crypto
+    const calculatedHash = crypto
       .createHmac("sha256", secretKey)
       .update(dataCheckString)
       .digest("hex");
 
+    const expectedBuffer = Buffer.from(calculatedHash, "hex");
+    const receivedBuffer = Buffer.from(receivedHash, "hex");
+
     if (
-      !crypto.timingSafeEqual(
-        Buffer.from(calculatedHash),
-        Buffer.from(receivedHash)
-      )
+      expectedBuffer.length !== receivedBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
     ) {
       return res.status(401).json({
         error: "Telegram authentication failed"
+      });
+    }
+
+    const authDate = Number(params.get("auth_date"));
+
+    if (!authDate) {
+      return res.status(400).json({
+        error: "Telegram authentication date missing"
+      });
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const age = now - authDate;
+
+    if (age < -60 || age > 86400) {
+      return res.status(401).json({
+        error: "Telegram authentication data expired"
       });
     }
 
