@@ -143,17 +143,40 @@ setIsVerifying(false);
   verifyTelegramUser();
 }, []);
 
- function watchAd() {
-    setMessage("Verifying sponsored ad...");
+async function watchAd() {
+  setMessage("Creating secure ad session...");
 
-    setTimeout(() => {
-      const reward = ads[ad].reward;
+  try {
+    const initData = window.Telegram?.WebApp?.initData;
 
-      setBalance((old) => old + reward);
-      setAd((old) => (old + 1) % ads.length);
-      setMessage(`+${reward} NXR credited`);
-    }, 1500);
+    if (!initData) {
+      setMessage("Telegram session not available.");
+      return;
+    }
+
+    const response = await fetch("/api/create-ad-event", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ initData }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.error || "Unable to create ad event");
+    }
+
+    setMessage("Ad session created. Waiting for verified completion...");
+    setAd((old) => (old + 1) % ads.length);
+
+    console.log("Nexr ad event created:", data.tracking_id);
+  } catch (error) {
+    console.error("Ad event error:", error);
+    setMessage("Unable to start sponsored ad.");
   }
+}
 
   function notify(text: string) {
     setMessage(text);
