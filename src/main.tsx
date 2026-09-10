@@ -78,11 +78,24 @@ const syncResponse = await fetch("/api/sync-nexr-user", {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-  initData: telegram.initData
-})
+    initData: telegram.initData
+  })
 });
 
-// Get the verified user's Nexr account
+const syncData = await syncResponse.json();
+
+if (!syncResponse.ok || !syncData.success) {
+  console.error("Nexr database sync failed:", syncData);
+
+  setMessage(
+    syncData.error || "Unable to create Nexr account"
+  );
+
+  setIsVerifying(false);
+  return;
+}
+
+console.log("Nexr account synced:", syncData);
 const accountResponse = await fetch("/api/get-nexr-account", {
   method: "POST",
   headers: {
