@@ -168,10 +168,35 @@ async function watchAd() {
       throw new Error(data?.error || "Unable to create ad event");
     }
 
-    setMessage("Ad session created. Waiting for verified completion...");
-    setAd((old) => (old + 1) % ads.length);
+    const ymid = data.tracking_id;
 
-    console.log("Nexr ad event created:", data.tracking_id);
+    if (!ymid) {
+      throw new Error("Ad tracking ID was not returned");
+    }
+
+    const showAd = (window as any).show_11741797;
+
+    if (typeof showAd !== "function") {
+      throw new Error("Monetag ad SDK is not available");
+    }
+
+    setMessage("Loading sponsored ad...");
+
+    const result = await showAd({
+      type: "end",
+      ymid,
+      requestVar: "watch_ad",
+    });
+
+    console.log("Monetag ad result:", result);
+
+    if (result?.reward_event_type === "valued") {
+      setMessage("Ad verified. Reward is being processed...");
+    } else {
+      setMessage("Ad completed, but no monetized reward was confirmed.");
+    }
+
+    setAd((old) => (old + 1) % ads.length);
   } catch (error) {
     console.error("Ad event error:", error);
     setMessage("Unable to start sponsored ad.");
