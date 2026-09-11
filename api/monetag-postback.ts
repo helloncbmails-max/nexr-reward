@@ -57,8 +57,8 @@ export default async function handler(
 
   if (
     reward_event_type &&
-    reward_event_type !== "valued" &&
-    reward_event_type !== "non_valued"
+    reward_event_type !== "yes" &&
+    reward_event_type !== "no"
   ) {
     return res.status(400).json({ error: "Invalid reward event type" });
   }
@@ -92,7 +92,7 @@ export default async function handler(
     });
   }
 
-  if (reward_event_type === "valued") {
+  if (reward_event_type === "yes") {
     const { error: updateError } = await supabase
       .from("nexr_ad_events")
       .update({
