@@ -63,11 +63,11 @@ export default async function handler(
     });
   }
 
-  if (
-    reward_event_type &&
-    reward_event_type !== "yes" &&
-    reward_event_type !== "no"
-  ) {
+if (
+  reward_event_type &&
+  reward_event_type !== "valued" &&
+  reward_event_type !== "non_valued"
+) {
     return res.status(400).json({
       error: "Invalid reward event type",
     });
@@ -111,8 +111,7 @@ export default async function handler(
     Only a Monetag rewarded event is allowed
     to trigger an NXR reward.
   */
-  if (reward_event_type === "yes") {
-    /*
+ if (reward_event_type === "valued") {    /*
       Rewarded Interstitial should settle from the
       monetized impression, not from a click event.
     */
