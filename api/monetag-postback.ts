@@ -14,7 +14,9 @@ export default async function handler(
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error("Supabase server configuration missing");
-    return res.status(500).json({ error: "Server configuration error" });
+    return res.status(500).json({
+      error: "Server configuration error",
+    });
   }
 
   const {
@@ -40,11 +42,15 @@ export default async function handler(
   });
 
   if (!ymid || typeof ymid !== "string") {
-    return res.status(400).json({ error: "Missing ymid" });
+    return res.status(400).json({
+      error: "Missing ymid",
+    });
   }
 
   if (zone_id && String(zone_id) !== "11741797") {
-    return res.status(400).json({ error: "Invalid zone" });
+    return res.status(400).json({
+      error: "Invalid zone",
+    });
   }
 
   if (
@@ -52,16 +58,20 @@ export default async function handler(
     event_type !== "impression" &&
     event_type !== "click"
   ) {
-    return res.status(400).json({ error: "Invalid event type" });
+    return res.status(400).json({
+      error: "Invalid event type",
+    });
   }
 
-if (
-  reward_event_type &&
-  reward_event_type !== "valued" &&
-  reward_event_type !== "non_valued"
-) {
-  return res.status(400).json({ error: "Invalid reward event type" });
-}
+  if (
+    reward_event_type &&
+    reward_event_type !== "yes" &&
+    reward_event_type !== "no"
+  ) {
+    return res.status(400).json({
+      error: "Invalid reward event type",
+    });
+  }
 
   const supabase = createClient(
     supabaseUrl,
@@ -75,13 +85,18 @@ if (
 
   const { data: adEvent, error: lookupError } = await supabase
     .from("nexr_ad_events")
-    .select("id, user_id, tracking_id, status, rewarded_at")
+    .select(
+      "id, user_id, tracking_id, status, completed_at, rewarded_at"
+    )
     .eq("tracking_id", ymid)
     .maybeSingle();
 
   if (lookupError) {
     console.error("Ad event lookup failed:", lookupError);
-    return res.status(500).json({ error: "Database lookup failed" });
+
+    return res.status(500).json({
+      error: "Database lookup failed",
+    });
   }
 
   if (!adEvent) {
@@ -92,26 +107,70 @@ if (
     });
   }
 
-  if (reward_event_type === "valued") {
-    const { error: updateError } = await supabase
-      .from("nexr_ad_events")
-      .update({
-        status: "completed",
-        completed_at: new Date().toISOString(),
-      })
-      .eq("id", adEvent.id)
-      .is("completed_at", null);
+  /*
+    Only a Monetag rewarded event is allowed
+    to trigger an NXR reward.
+  */
+  if (reward_event_type === "yes") {
+    /*
+      Rewarded Interstitial should settle from the
+      monetized impression, not from a click event.
+    */
+    if (event_type && event_type !== "impression") {
+      console.log(
+        "Ignoring rewarded click event for settlement:",
+        ymid
+      );
 
-    if (updateError) {
-      console.error("Ad event update failed:", updateError);
-      return res.status(500).json({
-        error: "Unable to update ad event",
+      return res.status(200).json({
+        success: true,
+        received: true,
+        rewarded: false,
       });
     }
+
+    /*
+      TESTNET REWARD
+      25 NXR is temporary and will later be replaced
+      by the revenue-backed reward calculation.
+    */
+    const testnetReward = 25;
+
+    const { data: settlement, error: settlementError } =
+      await supabase.rpc("settle_nxr_ad_reward", {
+        p_event_id: adEvent.id,
+        p_provider_event_id: ymid,
+        p_reward_amount: testnetReward,
+      });
+
+    if (settlementError) {
+      console.error(
+        "NXR reward settlement failed:",
+        settlementError
+      );
+
+      return res.status(500).json({
+        error: "Reward settlement failed",
+      });
+    }
+
+    console.log("NXR reward settlement result:", settlement);
+
+    return res.status(200).json({
+      success: true,
+      received: true,
+      rewarded: true,
+      settlement,
+    });
   }
 
+  /*
+    Monetag says the event was not paid.
+    No NXR reward is created.
+  */
   return res.status(200).json({
     success: true,
     received: true,
+    rewarded: false,
   });
 }
