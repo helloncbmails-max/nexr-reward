@@ -115,20 +115,39 @@ if (
       Rewarded Interstitial should settle from the
       monetized impression, not from a click event.
     */
-    if (event_type && event_type !== "impression") {
-      console.log(
-        "Ignoring rewarded click event for settlement:",
-        ymid
-      );
+    if (adEvent.completed_at === null) {
+      const { data: completedEvent, error: completionError } =
+        await supabase
+          .from("nexr_ad_events")
+          .update({
+            status: "completed",
+            completed_at: new Date().toISOString(),
+          })
+          .eq("id", adEvent.id)
+          .is("completed_at", null)
+          .select(
+            "id, user_id, tracking_id, status, completed_at, rewarded_at"
+          )
+          .maybeSingle();
 
-      return res.status(200).json({
-        success: true,
-        received: true,
-        rewarded: false,
-      });
-    }
+      if (completionError) {
+        console.error(
+          "Ad event completion failed:",
+          completionError
+        );
 
-    /*
+        return res.status(500).json({
+          error: "Ad event completion failed",
+        });
+      }
+
+      if (!completedEvent) {
+        console.log(
+          "Ad event was completed by another postback:",
+          ymid
+        );
+      }
+    }/*
       TESTNET REWARD
       25 NXR is temporary and will later be replaced
       by the revenue-backed reward calculation.
