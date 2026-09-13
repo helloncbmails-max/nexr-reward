@@ -111,9 +111,29 @@ if (
     Only a Monetag rewarded event is allowed
     to trigger an NXR reward.
   */
- if (reward_event_type === "valued") {    /*
+  if (reward_event_type === "valued") {
+    /*
       Rewarded Interstitial should settle from the
       monetized impression, not from a click event.
+    */
+    if (event_type && event_type !== "impression") {
+      console.log(
+        "Ignoring rewarded click event for settlement:",
+        ymid
+      );
+
+      return res.status(200).json({
+        success: true,
+        received: true,
+        rewarded: false,
+      });
+    }
+
+    /*
+      The trusted Monetag postback is the server-side
+      confirmation that the ad was completed.
+      Mark the pending ad event completed before the
+      settlement function checks its lifecycle state.
     */
     if (adEvent.completed_at === null) {
       const { data: completedEvent, error: completionError } =
@@ -147,7 +167,9 @@ if (
           ymid
         );
       }
-    }/*
+    }
+
+    /*
       TESTNET REWARD
       25 NXR is temporary and will later be replaced
       by the revenue-backed reward calculation.
