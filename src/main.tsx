@@ -11,6 +11,14 @@ type Tab = "home" | "earn" | "tasks" | "refer" | "wallet";
   status: string;
   created_at: string;
 };
+  type Task = {
+  id: string;
+  title: string;
+  description: string;
+  reward: number | string;
+  status: string;
+  created_at: string;
+};
 const ads = [
   { title: "Sponsored Video", reward: 25, time: "20 seconds" },
   { title: "Partner Campaign", reward: 35, time: "25 seconds" },
@@ -24,6 +32,8 @@ function App() {
   const [message, setMessage] = useState("");
   const [transactions, setTransactions] = useState<RewardTransaction[]>([]);
 const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
+const [tasks, setTasks] = useState<Task[]>([]);
+const [isLoadingTasks, setIsLoadingTasks] = useState(false);
   const [telegramUser, setTelegramUser] = useState<{
   telegram_id: number;
   username: string | null;
@@ -245,6 +255,52 @@ useEffect(() => {
   loadRewardHistory();
 }, [tab]);
 
+useEffect(() => {
+  if (tab !== "tasks") {
+    return;
+  }
+
+  async function loadTasks() {
+    try {
+      setIsLoadingTasks(true);
+
+      const initData = window.Telegram?.WebApp?.initData;
+
+      if (!initData) {
+        console.error("Telegram session unavailable");
+        return;
+      }
+
+      const response = await fetch("/api/get-tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          initData,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("Tasks response:", data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || "Unable to load tasks"
+        );
+      }
+
+      setTasks(data.tasks || []);
+    } catch (error) {
+      console.error("Tasks loading error:", error);
+    } finally {
+      setIsLoadingTasks(false);
+    }
+  }
+
+  loadTasks();
+}, [tab]);
 
 async function watchAd() {
   setMessage("Creating secure ad session...");
