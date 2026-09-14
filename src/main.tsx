@@ -198,6 +198,54 @@ useEffect(() => {
   verifyTelegramUser();
 }, []);
 
+useEffect(() => {
+  if (tab !== "wallet") {
+    return;
+  }
+
+  async function loadRewardHistory() {
+    try {
+      setIsLoadingTransactions(true);
+
+      const initData = window.Telegram?.WebApp?.initData;
+
+      if (!initData) {
+        console.error("Telegram session unavailable");
+        return;
+      }
+
+      const response = await fetch("/api/get-reward-history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          initData,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("Reward history response:", data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || "Unable to load reward history"
+        );
+      }
+
+      setTransactions(data.transactions || []);
+    } catch (error) {
+      console.error("Reward history error:", error);
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  }
+
+  loadRewardHistory();
+}, [tab]);
+
+
 async function watchAd() {
   setMessage("Creating secure ad session...");
 
