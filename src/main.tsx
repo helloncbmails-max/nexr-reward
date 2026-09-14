@@ -24,14 +24,14 @@ function App() {
 
 const [isVerifying, setIsVerifying] = useState(true);
   
- useEffect(() => {
+useEffect(() => {
   async function verifyTelegramUser() {
     try {
       const telegram = (window as any).Telegram?.WebApp;
 
       if (!telegram) {
-  console.log("Nexr opened outside Telegram");
-  setMessage("Telegram WebApp was not detected");
+        console.log("Nexr opened outside Telegram");
+        setMessage("Telegram WebApp was not detected");
         setIsVerifying(false);
         return;
       }
@@ -39,12 +39,13 @@ const [isVerifying, setIsVerifying] = useState(true);
       telegram.ready();
 
       if (!telegram.initData) {
-  console.log("Telegram authentication data unavailable");
-  setMessage("Telegram authentication data is unavailable");
+        console.log("Telegram authentication data unavailable");
+        setMessage("Telegram authentication data is unavailable");
         setIsVerifying(false);
         return;
       }
 
+      // Step 1: Verify Telegram identity
       const response = await fetch("/api/verify-telegram", {
         method: "POST",
         headers: {
@@ -59,82 +60,128 @@ const [isVerifying, setIsVerifying] = useState(true);
 
       if (!response.ok || !data.verified) {
         console.error("Telegram verification failed:", data);
+
         setMessage(
-  data.error || "Unable to verify Telegram account"
-);
+          data.error || "Unable to verify Telegram account"
+        );
+
         setIsVerifying(false);
         return;
       }
 
       setTelegramUser(data.user);
-console.log("Verified Nexr user:", data.user);
 
-setMessage("Telegram verified. Syncing Nexr account...");
+      console.log("Verified Nexr user:", data.user);
 
-// Sync verified Telegram user with Nexr database
-const syncResponse = await fetch("/api/sync-nexr-user", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    initData: telegram.initData
-  })
-});
+      // Step 2: Sync account and load balance
+      let accountLoaded = false;
 
-const syncData = await syncResponse.json();
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          console.log(
+            `Nexr account startup attempt ${attempt}/3`
+          );
 
-if (!syncResponse.ok || !syncData.success) {
-  console.error("Nexr database sync failed:", syncData);
+          setMessage(
+            attempt === 1
+              ? "Telegram verified. Syncing Nexr account..."
+              : `Syncing Nexr account... (retry ${attempt}/3)`
+          );
 
-  setMessage(
-    syncData.error || "Unable to create Nexr account"
-  );
+          // Sync verified Telegram user with Nexr database
+          const syncResponse = await fetch("/api/sync-nexr-user", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              initData: telegram.initData
+            })
+          });
 
-  setIsVerifying(false);
-  return;
-}
+          const syncData = await syncResponse.json();
 
-console.log("Nexr account synced:", syncData);
-const accountResponse = await fetch("/api/get-nexr-account", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    initData: telegram.initData
-  })
-});
+          console.log("Nexr sync response:", syncData);
 
-const accountData = await accountResponse.json();
+          if (!syncResponse.ok || !syncData.success) {
+            throw new Error(
+              syncData.error || "Unable to sync Nexr account"
+            );
+          }
 
-if (!accountResponse.ok || !accountData.success) {
-  console.error("Nexr account fetch failed:", accountData);
+          console.log("Nexr account synced:", syncData);
 
-  setMessage(
-    accountData.error || "Unable to load Nexr account"
-  );
+          // Load the real Nexr account and balance
+          const accountResponse = await fetch(
+            "/api/get-nexr-account",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                initData: telegram.initData
+              })
+            }
+          );
 
-  setIsVerifying(false);
-  return;
-}
+          const accountData = await accountResponse.json();
 
-// Load the real balance from Supabase
-setBalance(accountData.balance);
+          console.log(
+            "Nexr account response:",
+            accountData
+          );
 
-console.log("Nexr account loaded:", accountData);
+          if (!accountResponse.ok || !accountData.success) {
+            throw new Error(
+              accountData.error ||
+                "Unable to load Nexr account"
+            );
+          }
 
-console.log("Nexr account synced:", syncData);
+          // Load the real balance from Supabase
+          setBalance(accountData.balance);
 
-setMessage("Nexr account successfully updated!");
+          console.log(
+            "Nexr account loaded:",
+            accountData
+          );
 
-setTimeout(() => {
-  setMessage("");
-}, 3000);
+          accountLoaded = true;
 
-setIsVerifying(false);
+          setMessage(
+            "Nexr account successfully updated!"
+          );
+
+          setTimeout(() => {
+            setMessage("");
+          }, 3000);
+
+          break;
+        } catch (error) {
+          console.error(
+            `Nexr account startup attempt ${attempt} failed:`,
+            error
+          );
+
+          if (attempt < 3) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, 1000 * attempt)
+            );
+          }
+        }
+      }
+
+      if (!accountLoaded) {
+        setMessage(
+          "Unable to sync Nexr account. Please try opening the Mini App again."
+        );
+      }
+
+      setIsVerifying(false);
     } catch (error) {
       console.error("Telegram connection error:", error);
+
       setMessage("Telegram connection error");
       setIsVerifying(false);
     }
