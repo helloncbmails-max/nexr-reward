@@ -583,18 +583,63 @@ setAd((old) => (old + 1) % ads.length);
           </>
         )}
 
-        {tab === "tasks" && (
-          <>
-            <div className="pageTitle">
-              <span>Campaigns</span>
-              <h1>Tasks</h1>
+{tab === "tasks" && (
+  <>
+    <div className="pageTitle">
+      <span>Campaigns</span>
+      <h1>Tasks</h1>
+    </div>
+
+    {isLoadingTasks ? (
+      <section className="card">
+        <div className="emptyState">
+          Loading available tasks...
+        </div>
+      </section>
+    ) : tasks.length === 0 ? (
+      <section className="card">
+        <div className="emptyState">
+          No tasks are available right now.
+        </div>
+      </section>
+    ) : (
+      tasks.map((task) => {
+        const reward = Number(task.reward);
+
+        return (
+          <section
+            className="card task"
+            key={task.id}
+          >
+            <div>
+              <span className="label">
+                SPONSORED
+              </span>
+
+              <h2>{task.title}</h2>
+
+              <p>{task.description}</p>
             </div>
 
-            {[
-              ["Partner Campaign", "Complete a verified promotional action", 250],
-              ["Community Campaign", "Join an approved partner community", 150],
-              ["Survey Campaign", "Complete a sponsored survey", 400]
-            ].map(([title, description, reward]) => (
+            <strong>
+              +{reward.toLocaleString()} NXR
+            </strong>
+
+            <button
+              onClick={() =>
+                notify(
+                  "Task opened. Verification will be connected next."
+                )
+              }
+            >
+              OPEN TASK
+            </button>
+          </section>
+        );
+      })
+    )}
+  </>
+)}.map(([title, description, reward]) => (
               <section className="card task" key={String(title)}>
 
                 <div>
