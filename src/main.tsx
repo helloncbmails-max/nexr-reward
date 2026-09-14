@@ -3,7 +3,14 @@ import { createRoot } from "react-dom/client";
 import "./styles.css";
 
 type Tab = "home" | "earn" | "tasks" | "refer" | "wallet";
-
+ type RewardTransaction = {
+  id: string;
+  amount: number | string;
+  transaction_type: string;
+  description: string;
+  status: string;
+  created_at: string;
+};
 const ads = [
   { title: "Sponsored Video", reward: 25, time: "20 seconds" },
   { title: "Partner Campaign", reward: 35, time: "25 seconds" },
@@ -15,7 +22,8 @@ function App() {
   const [balance, setBalance] = useState(57339);
   const [ad, setAd] = useState(0);
   const [message, setMessage] = useState("");
-   
+  const [transactions, setTransactions] = useState<RewardTransaction[]>([]);
+const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
   const [telegramUser, setTelegramUser] = useState<{
   telegram_id: number;
   username: string | null;
