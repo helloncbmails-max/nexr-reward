@@ -522,26 +522,64 @@ button.full {
 
 .ledger {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ledgerRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
+  gap: 14px;
+  width: 100%;
   padding: 15px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.ledger:last-child {
+.ledgerRow:last-child {
   border-bottom: 0;
 }
 
-.ledger strong {
-  color: #d6b36a;
-  font-size: 14px;
+.ledgerRow > div {
+  min-width: 0;
+  flex: 1;
 }
 
-.ledger span {
+.ledgerRow > div strong {
+  display: block;
+  color: #d6b36a;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.ledgerRow > div span {
+  display: block;
+  margin-top: 5px;
   color: #777f8d;
   font-size: 10px;
-  text-align: right;
+  line-height: 1.4;
+}
+
+.ledgerRow > strong {
+  flex-shrink: 0;
+  color: #d6b36a;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.positive {
+  color: #d6b36a;
+}
+
+.negative {
+  color: #e47777;
+}
+
+.emptyState {
+  padding: 20px 0;
+  color: #777f8d;
+  font-size: 11px;
+  text-align: center;
 }
 
 /* =========================
