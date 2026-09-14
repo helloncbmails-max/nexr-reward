@@ -188,15 +188,72 @@ async function watchAd() {
       requestVar: "watch_ad",
     });
 
-    console.log("Monetag ad result:", result);
+console.log("Monetag ad result:", result);
 
-    if (result?.reward_event_type === "valued") {
-      setMessage("Ad verified. Reward is being processed...");
-    } else {
-      setMessage("Ad completed, but no monetized reward was confirmed.");
+if (result?.reward_event_type === "valued") {
+  setMessage("Ad verified. Checking reward...");
+
+  let approved = false;
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    const statusResponse = await fetch("/api/ad-reward-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        initData,
+        tracking_id: ymid,
+      }),
+    });
+
+    const statusData = await statusResponse.json();
+
+    console.log("Ad reward status:", statusData);
+
+    if (statusResponse.ok && statusData.status === "approved") {
+      approved = true;
+
+      const accountResponse = await fetch("/api/get-nexr-account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          initData,
+        }),
+      });
+
+      const accountData = await accountResponse.json();
+
+      if (accountResponse.ok && accountData.success) {
+        setBalance(accountData.balance);
+      }
+
+      setMessage(`Reward approved. +${statusData.reward} NXR credited.`);
+
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
+
+      break;
     }
 
-    setAd((old) => (old + 1) % ads.length);
+    if (statusResponse.ok && statusData.status === "processing") {
+      setMessage("Ad verified. Reward is being processed...");
+    }
+  }
+
+  if (!approved) {
+    setMessage("Ad verified. Reward is still processing.");
+  }
+} else {
+  setMessage("Ad completed, but no monetized reward was confirmed.");
+}
+
+setAd((old) => (old + 1) % ads.length);
   } catch (error) {
     console.error("Ad event error:", error);
     setMessage("Unable to start sponsored ad.");
