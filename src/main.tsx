@@ -652,26 +652,78 @@ setAd((old) => (old + 1) % ads.length);
 
             <section className="card">
 
-              <div className="sectionHead">
-                <h2>Recent activity</h2>
-              </div>
+  <div className="sectionHead">
+    <h2>Recent activity</h2>
+  </div>
 
-              <div className="ledger">
-                <strong>+25 NXR</strong>
-                <span>Sponsored ad · verified</span>
-              </div>
+  <div className="ledger">
 
-              <div className="ledger">
-                <strong>+250 NXR</strong>
-                <span>Partner campaign</span>
-              </div>
+    {isLoadingTransactions ? (
 
-              <div className="ledger">
-                <strong>+100 NXR</strong>
-                <span>Daily check-in</span>
-              </div>
+      <div className="emptyState">
+        Loading reward history...
+      </div>
 
-            </section>
+    ) : transactions.length === 0 ? (
+
+      <div className="emptyState">
+        No reward activity yet.
+      </div>
+
+    ) : (
+
+      transactions.map((transaction) => {
+
+        const amount = Number(transaction.amount);
+
+        const isPositive = amount > 0;
+
+        return (
+
+          <div
+            className="ledgerRow"
+            key={transaction.id}
+          >
+
+            <div>
+
+              <strong>
+                {transaction.description}
+              </strong>
+
+              <span>
+                {new Date(
+                  transaction.created_at
+                ).toLocaleString()}
+              </span>
+
+            </div>
+
+            <strong
+              className={
+                isPositive
+                  ? "positive"
+                  : "negative"
+              }
+            >
+
+              {isPositive ? "+" : ""}
+
+              {amount.toLocaleString()} NXR
+
+            </strong>
+
+          </div>
+
+        );
+
+      })
+
+    )}
+
+  </div>
+
+</section>
           </>
         )}
 
