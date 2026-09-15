@@ -418,6 +418,68 @@ setAd((old) => (old + 1) % ads.length);
     setMessage("Unable to start sponsored ad.");
   }
 }
+  
+async function startTask(taskId: string) {
+  setMessage("Starting task...");
+
+  try {
+    const initData =
+      window.Telegram?.WebApp?.initData;
+
+    if (!initData) {
+      setMessage("Telegram session not available.");
+      return;
+    }
+
+    const response = await fetch("/api/start-task", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        initData,
+        task_id: taskId,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log("Start task response:", data);
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.error || "Unable to start task"
+      );
+    }
+
+    if (data.already_started) {
+      setMessage(
+        "You have already started this task."
+      );
+      return;
+    }
+
+    setMessage(
+      "Task started. Complete the campaign to continue."
+    );
+
+    setTimeout(() => {
+      setMessage("");
+    }, 3000);
+
+  } catch (error) {
+    console.error(
+      "Start task error:",
+      error
+    );
+
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to start task."
+    );
+  }
+}
 
   function notify(text: string) {
     setMessage(text);
@@ -625,15 +687,11 @@ setAd((old) => (old + 1) % ads.length);
               +{reward.toLocaleString()} NXR
             </strong>
 
-            <button
-              onClick={() =>
-                notify(
-                  "Task opened. Verification will be connected next."
-                )
-              }
-            >
-              OPEN TASK
-            </button>
+      <button
+           onClick={() => startTask(task.id)}
+   >
+     OPEN TASK
+          </button>
           </section>
         );
       })
