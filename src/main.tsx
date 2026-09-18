@@ -697,27 +697,7 @@ async function startTask(taskId: string) {
       })
     )}
   </>
-)}.map(([title, description, reward]) => (
-              <section className="card task" key={String(title)}>
 
-                <div>
-                  <span className="label">SPONSORED</span>
-                  <h2>{title}</h2>
-                  <p>{description}</p>
-                </div>
-
-                <strong>+{reward} NXR</strong>
-
-                <button
-                  onClick={() =>
-                    notify("Task opened. Verification will happen through the campaign provider.")
-                  }
-                >
-                  OPEN TASK
-                </button>
-
-              </section>
-            ))}
           </>
         )}
 
