@@ -698,8 +698,7 @@ async function startTask(taskId: string) {
     )}
   </>
 
-          </>
-        )}
+  )}
 
         {tab === "refer" && (
           <>
