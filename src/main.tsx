@@ -459,13 +459,22 @@ async function startTask(taskId: string) {
       return;
     }
 
-    setMessage(
-      "Task started. Complete the campaign to continue."
-    );
+setMessage(
+  "Task started. Opening campaign..."
+);
 
-    setTimeout(() => {
-      setMessage("");
-    }, 3000);
+const campaignLink = "https://t.me/nexronboard";
+const telegram = (window as any).Telegram?.WebApp;
+
+if (telegram?.openTelegramLink) {
+  telegram.openTelegramLink(campaignLink);
+} else {
+  window.open(campaignLink, "_blank");
+}
+
+setTimeout(() => {
+  setMessage("");
+}, 3000);
 
   } catch (error) {
     console.error(
