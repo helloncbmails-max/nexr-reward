@@ -463,7 +463,7 @@ setMessage(
   "Task started. Opening campaign..."
 );
 
-const campaignLink = "https://t.me/nexronboard";
+const campaignLink = "https://t.me/+wegGqWBokY01NmVk";
 const telegram = (window as any).Telegram?.WebApp;
 
 if (telegram?.openTelegramLink) {
