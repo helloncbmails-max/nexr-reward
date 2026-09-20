@@ -463,7 +463,7 @@ setMessage(
   "Task started. Opening campaign..."
 );
 
-const campaignLink = "https://t.me/+wegGqWBokY01NmVk";
+const campaignLink = "https://t.me/nexronboard";
 const telegram = (window as any).Telegram?.WebApp;
 
 if (telegram?.openTelegramLink) {
@@ -475,7 +475,6 @@ if (telegram?.openTelegramLink) {
 setTimeout(() => {
   setMessage("");
 }, 3000);
-
   } catch (error) {
     console.error(
       "Start task error:",
