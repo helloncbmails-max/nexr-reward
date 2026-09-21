@@ -452,18 +452,17 @@ async function startTask(taskId: string) {
       );
     }
 
-    if (data.already_started) {
-      setMessage(
-        "You have already started this task."
-      );
-      return;
-    }
+if (data.already_started) {
+  setMessage(
+    "You have already started this task. Opening campaign..."
+  );
+} else {
+  setMessage(
+    "Task started. Opening campaign..."
+  );
+}
 
-setMessage(
-  "Task started. Opening campaign..."
-);
-
-const campaignLink ="https://t.me/airdrop_oracle";
+const campaignLink = "https://t.me/airdrop_oracle";
 const telegram = (window as any).Telegram?.WebApp;
 
 if (telegram?.openTelegramLink) {
@@ -471,7 +470,6 @@ if (telegram?.openTelegramLink) {
 } else {
   window.open(campaignLink, "_blank");
 }
-
 setTimeout(() => {
   setMessage("");
 }, 3000);
