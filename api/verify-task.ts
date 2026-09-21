@@ -147,7 +147,7 @@ export default async function handler(req: any, res: any) {
 
     // Check Telegram membership
     const telegramResponse = await fetch(
-      `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=@nexronboard&user_id=${telegramId}`
+      `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=@nexronboarding&user_id=${telegramId}`
     );
 
     const telegramData = await telegramResponse.json();
