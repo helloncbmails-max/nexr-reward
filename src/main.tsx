@@ -462,7 +462,7 @@ if (data.already_started) {
   );
 }
 
-const campaignLink = "https://t.me/+f4IwT_erVe05YTY0";
+const campaignLink = "https://t.me/nexronboarding";
 const telegram = (window as any).Telegram?.WebApp;
 
 if (telegram?.openTelegramLink) {
