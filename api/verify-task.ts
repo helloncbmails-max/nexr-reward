@@ -137,13 +137,53 @@ export default async function handler(req: any, res: any) {
 
     const completion = completions[0];
 
-    if (completion.status === "approved") {
-      return res.status(200).json({
-        success: true,
-        status: "approved",
-        message: "Task already verified.",
-      });
+// If already approved, still run settlement.
+// The RPC is idempotent and will not pay twice.
+if (completion.status === "approved") {
+  const settlementResponse = await fetch(
+    `${supabaseUrl}/rest/v1/rpc/settle_nxr_task_reward`,
+    {
+      method: "POST",
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        p_completion_id: completion.id,
+      }),
     }
+  );
+
+  const settlementData = await settlementResponse.json();
+
+  if (
+    !settlementResponse.ok ||
+    !Array.isArray(settlementData) ||
+    !settlementData.length
+  ) {
+    console.error("Task reward settlement failed:", settlementData);
+
+    return res.status(500).json({
+      error:
+        "Task verified, but reward settlement failed. Please try VERIFY again.",
+    });
+  }
+
+  const settlement = settlementData[0];
+
+  return res.status(200).json({
+    success: true,
+    status: "approved",
+    result: settlement.result,
+    reward_amount: settlement.reward_amount,
+    new_balance: settlement.new_balance,
+    message:
+      settlement.result === "already_rewarded"
+        ? "Task already verified and rewarded."
+        : "Task verified and reward credited.",
+  });
+}
 
     // Check Telegram membership
     const telegramResponse = await fetch(
@@ -203,12 +243,48 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      status: "approved",
-      message: "Campaign completed and verified.",
-      completion: updated[0],
-    });
+// Settle the NXR reward through the secure Supabase RPC.
+const settlementResponse = await fetch(
+  `${supabaseUrl}/rest/v1/rpc/settle_nxr_task_reward`,
+  {
+    method: "POST",
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      p_completion_id: completion.id,
+    }),
+  }
+);
+
+const settlementData = await settlementResponse.json();
+
+if (
+  !settlementResponse.ok ||
+  !Array.isArray(settlementData) ||
+  !settlementData.length
+) {
+  console.error("Task reward settlement failed:", settlementData);
+
+  return res.status(500).json({
+    error:
+      "Task verified, but reward settlement failed. Please try VERIFY again.",
+  });
+}
+
+const settlement = settlementData[0];
+
+return res.status(200).json({
+  success: true,
+  status: "approved",
+  result: settlement.result,
+  reward_amount: settlement.reward_amount,
+  new_balance: settlement.new_balance,
+  message: "Campaign completed and reward credited.",
+  completion: updated[0],
+});
   } catch (error) {
     console.error("Task verification error:", error);
 
