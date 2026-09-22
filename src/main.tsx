@@ -488,6 +488,63 @@ setTimeout(() => {
   }
 }
 
+  async function verifyTask(taskId: string) {
+  setMessage("Verifying task...");
+
+  try {
+    const initData =
+      window.Telegram?.WebApp?.initData;
+
+    if (!initData) {
+      setMessage("Telegram session not available.");
+      return;
+    }
+
+    const response = await fetch("/api/verify-task", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        initData,
+        task_id: taskId,
+      }),
+    });
+
+    const data = await response.json();
+
+    console.log("Verify task response:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Unable to verify task"
+      );
+    }
+
+    if (data.status === "approved") {
+      setMessage("Task verified successfully!");
+
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
+
+      return;
+    }
+
+    setMessage(
+      data.message || "Please join the NEXR community first."
+    );
+  } catch (error) {
+    console.error("Verify task error:", error);
+
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Unable to verify task."
+    );
+  }
+}
+
   function notify(text: string) {
     setMessage(text);
 
@@ -694,11 +751,20 @@ setTimeout(() => {
               +{reward.toLocaleString()} NXR
             </strong>
 
-      <button
-           onClick={() => startTask(task.id)}
-   >
-     OPEN TASK
-          </button>
+<div className="taskActions">
+  <button
+    onClick={() => startTask(task.id)}
+  >
+    OPEN TASK
+  </button>
+
+  <button
+    className="secondary"
+    onClick={() => verifyTask(task.id)}
+  >
+    VERIFY
+  </button>
+</div>
           </section>
         );
       })
