@@ -66,7 +66,10 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { initData } = req.body;
+    const {
+      initData,
+      referralCode
+    } = req.body;
 
     if (!initData) {
       return res.status(400).json({
@@ -97,39 +100,42 @@ export default async function handler(req: any, res: any) {
       serviceRoleKey
     );
 
+    // Check whether this Telegram user already exists
+    const { data: existingUser } = await supabase
+      .from("nexr_users")
+      .select("id, referral_code")
+      .eq(
+        "telegram_id",
+        Number(telegramUser.id)
+      )
+      .maybeSingle();
+
+    // Keep existing referral code.
+    // Generate a new branded code only when needed.
+    const userReferralCode =
+      existingUser?.referral_code ||
+      `NXR-${crypto
+        .randomBytes(4)
+        .toString("hex")
+        .substring(0, 6)
+        .toUpperCase()}`;
+
     // Create or update the verified Nexr user
-const { data: existingUser } = await supabase
-  .from("nexr_users")
-  .select("id, referral_code")
-  .eq(
-    "telegram_id",
-    Number(telegramUser.id)
-  )
-  .maybeSingle();
-
-const referralCode =
-  existingUser?.referral_code ||
-  `NXR-${crypto
-    .randomBytes(4)
-    .toString("hex")
-    .substring(0, 6)
-    .toUpperCase()}`;
-
-const { data: user, error: userError } = await supabase
-  .from("nexr_users")
-  .upsert(
-    {
-      telegram_id: Number(telegramUser.id),
-      username: telegramUser.username || null,
-      first_name: telegramUser.first_name || null,
-      referral_code: referralCode
-    },
-    {
-      onConflict: "telegram_id"
-    }
-  )
-  .select()
-  .single();
+    const { data: user, error: userError } = await supabase
+      .from("nexr_users")
+      .upsert(
+        {
+          telegram_id: Number(telegramUser.id),
+          username: telegramUser.username || null,
+          first_name: telegramUser.first_name || null,
+          referral_code: userReferralCode
+        },
+        {
+          onConflict: "telegram_id"
+        }
+      )
+      .select()
+      .single();
 
     if (userError || !user) {
       console.error("Nexr user error:", userError);
@@ -139,22 +145,68 @@ const { data: user, error: userError } = await supabase
       });
     }
 
-    // Ensure the user has exactly one balance record
-    const { data: balance, error: balanceError } = await supabase
-      .from("nexr_balances")
-      .upsert(
-        {
-          user_id: user.id
-        },
-        {
-          onConflict: "user_id"
+    // Record referral only for a genuinely new Nexr user.
+    if (!existingUser && referralCode) {
+      const cleanReferralCode = String(referralCode).trim();
+
+      // Find the user who owns the referral code
+      const { data: referrer, error: referrerError } =
+        await supabase
+          .from("nexr_users")
+          .select("id")
+          .eq("referral_code", cleanReferralCode)
+          .maybeSingle();
+
+      if (referrerError) {
+        console.error(
+          "Referral lookup error:",
+          referrerError
+        );
+      } else if (referrer && referrer.id !== user.id) {
+        // Record the referral relationship
+        const { error: referralError } = await supabase
+          .from("referrals")
+          .insert({
+            referrer_id: referrer.id,
+            referred_id: user.id
+          });
+
+        if (referralError) {
+          console.error(
+            "Referral recording error:",
+            referralError
+          );
+        } else {
+          console.log(
+            "Referral recorded:",
+            referrer.id,
+            "->",
+            user.id
+          );
         }
-      )
-      .select()
-      .single();
+      }
+    }
+
+    // Ensure the user has exactly one balance record
+    const { data: balance, error: balanceError } =
+      await supabase
+        .from("nexr_balances")
+        .upsert(
+          {
+            user_id: user.id
+          },
+          {
+            onConflict: "user_id"
+          }
+        )
+        .select()
+        .single();
 
     if (balanceError) {
-      console.error("Nexr balance error:", balanceError);
+      console.error(
+        "Nexr balance error:",
+        balanceError
+      );
 
       return res.status(500).json({
         error: "Could not create Nexr balance"
