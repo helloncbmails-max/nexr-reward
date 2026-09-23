@@ -175,9 +175,7 @@ export default async function handler(
       error: tasksError,
     } = await supabase
       .from("tasks")
-      .select(
-        "id, title, description, reward, status, created_at"
-      )
+      .select("id, title, description, reward, status, link, created_at")
       .eq("status", "active")
       .order("created_at", {
         ascending: false,
