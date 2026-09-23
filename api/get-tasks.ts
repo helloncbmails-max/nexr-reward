@@ -193,9 +193,67 @@ export default async function handler(
       });
     }
 
+    const taskIds = (tasks || []).map(
+      (task) => task.id
+    );
+
+    let completions: any[] = [];
+
+    if (taskIds.length > 0) {
+      const {
+        data: completionData,
+        error: completionError,
+      } = await supabase
+        .from("task_completions")
+        .select("task_id, status, rewarded_at")
+        .eq("user_id", user.id)
+        .in("task_id", taskIds);
+
+      if (completionError) {
+        console.error(
+          "Task completion lookup error:",
+          completionError
+        );
+
+        return res.status(500).json({
+          error: "Unable to load task progress",
+        });
+      }
+
+      completions = completionData || [];
+    }
+
+    const completionMap = new Map(
+      completions.map((completion) => [
+        completion.task_id,
+        completion,
+      ])
+    );
+
+    const tasksWithProgress = (tasks || []).map(
+      (task) => {
+        const completion = completionMap.get(task.id);
+
+        let completion_status = "available";
+
+        if (completion?.rewarded_at) {
+          completion_status = "completed";
+        } else if (completion?.status === "pending") {
+          completion_status = "pending";
+        } else if (completion?.status === "approved") {
+          completion_status = "completed";
+        }
+
+        return {
+          ...task,
+          completion_status,
+        };
+      }
+    );
+
     return res.status(200).json({
       success: true,
-      tasks: tasks || [],
+      tasks: tasksWithProgress,
     });
 
   } catch (error) {
