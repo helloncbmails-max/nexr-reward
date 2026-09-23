@@ -488,7 +488,7 @@ setTimeout(() => {
   }
 }
 
-  async function verifyTask(taskId: string) {
+async function verifyTask(taskId: string) {
   setMessage("Verifying task...");
 
   try {
@@ -522,20 +522,72 @@ setTimeout(() => {
     }
 
     if (data.status === "approved") {
-      setMessage("Task verified successfully!");
+      const rewardAmount = Number(data.reward_amount || 0);
+
+      if (rewardAmount > 0) {
+        setMessage(
+          `Task verified successfully! +${rewardAmount} NXR`
+        );
+      } else {
+        setMessage(
+          data.message || "Task verified successfully!"
+        );
+      }
+
+      // Refresh the authoritative NXR balance
+      try {
+        const accountResponse = await fetch(
+          "/api/get-nexr-account",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              initData,
+            }),
+          }
+        );
+
+        const accountData = await accountResponse.json();
+
+        console.log(
+          "Updated account after task reward:",
+          accountData
+        );
+
+        if (
+          accountResponse.ok &&
+          accountData.success
+        ) {
+          setBalance(
+            Number(accountData.balance || 0)
+          );
+        }
+      } catch (balanceError) {
+        console.error(
+          "Balance refresh failed:",
+          balanceError
+        );
+      }
 
       setTimeout(() => {
         setMessage("");
-      }, 3000);
+      }, 4000);
 
       return;
     }
 
     setMessage(
-      data.message || "Please join the NEXR community first."
+      data.message ||
+      "Please join the NEXR community first."
     );
+
   } catch (error) {
-    console.error("Verify task error:", error);
+    console.error(
+      "Verify task error:",
+      error
+    );
 
     setMessage(
       error instanceof Error
@@ -544,8 +596,8 @@ setTimeout(() => {
     );
   }
 }
-
-  function notify(text: string) {
+  
+function notify(text: string) {
     setMessage(text);
 
     setTimeout(() => {
