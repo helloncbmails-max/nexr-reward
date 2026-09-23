@@ -98,20 +98,38 @@ export default async function handler(req: any, res: any) {
     );
 
     // Create or update the verified Nexr user
-    const { data: user, error: userError } = await supabase
-      .from("nexr_users")
-      .upsert(
-        {
-          telegram_id: Number(telegramUser.id),
-          username: telegramUser.username || null,
-          first_name: telegramUser.first_name || null
-        },
-        {
-          onConflict: "telegram_id"
-        }
-      )
-      .select()
-      .single();
+const { data: existingUser } = await supabase
+  .from("nexr_users")
+  .select("id, referral_code")
+  .eq(
+    "telegram_id",
+    Number(telegramUser.id)
+  )
+  .maybeSingle();
+
+const referralCode =
+  existingUser?.referral_code ||
+  `NXR-${crypto
+    .randomBytes(4)
+    .toString("hex")
+    .substring(0, 6)
+    .toUpperCase()}`;
+
+const { data: user, error: userError } = await supabase
+  .from("nexr_users")
+  .upsert(
+    {
+      telegram_id: Number(telegramUser.id),
+      username: telegramUser.username || null,
+      first_name: telegramUser.first_name || null,
+      referral_code: referralCode
+    },
+    {
+      onConflict: "telegram_id"
+    }
+  )
+  .select()
+  .single();
 
     if (userError || !user) {
       console.error("Nexr user error:", userError);
