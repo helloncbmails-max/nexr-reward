@@ -419,7 +419,10 @@ setAd((old) => (old + 1) % ads.length);
   }
 }
   
-async function startTask(taskId: string) {
+async function startTask(
+  taskId: string,
+  campaignLink: string
+) {
   setMessage("Starting task...");
 
   try {
@@ -462,7 +465,6 @@ if (data.already_started) {
   );
 }
 
-const campaignLink = "https://t.me/nexronboarding";
 const telegram = (window as any).Telegram?.WebApp;
 
 if (telegram?.openTelegramLink) {
@@ -805,7 +807,7 @@ function notify(text: string) {
 
 <div className="taskActions">
   <button
-    onClick={() => startTask(task.id)}
+    onClick={() => startTask(task.id, task.link)}
   >
     OPEN TASK
   </button>
