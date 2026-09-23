@@ -526,8 +526,18 @@ async function verifyTask(taskId: string) {
     }
 
     if (data.status === "approved") {
-      const rewardAmount = Number(data.reward_amount || 0);
+const rewardAmount = Number(data.reward_amount || 0);
 
+setTasks((currentTasks) =>
+  currentTasks.map((task) =>
+    task.id === taskId
+      ? {
+          ...task,
+          completion_status: "completed",
+        }
+      : task
+  )
+);
       if (rewardAmount > 0) {
         setMessage(
           `Task verified successfully! +${rewardAmount} NXR`
