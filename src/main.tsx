@@ -57,7 +57,10 @@ useEffect(() => {
       }
 
       telegram.ready();
-
+        
+      const referralCode =
+  telegram.startParam || "";
+      
       if (!telegram.initData) {
         console.log("Telegram authentication data unavailable");
         setMessage("Telegram authentication data is unavailable");
