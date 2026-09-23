@@ -11,13 +11,15 @@ type Tab = "home" | "earn" | "tasks" | "refer" | "wallet";
   status: string;
   created_at: string;
 };
-  type Task = {
+type Task = {
   id: string;
   title: string;
   description: string;
   reward: number | string;
   status: string;
+  link: string;
   created_at: string;
+  completion_status: "available" | "pending" | "completed";
 };
 const ads = [
   { title: "Sponsored Video", reward: 25, time: "20 seconds" },
