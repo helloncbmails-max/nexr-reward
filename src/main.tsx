@@ -808,18 +808,33 @@ function notify(text: string) {
             </strong>
 
 <div className="taskActions">
-  <button
-    onClick={() => startTask(task.id, task.link)}
-  >
-    OPEN TASK
-  </button>
+  {task.completion_status === "available" && (
+    <button
+      onClick={() => startTask(task.id, task.link)}
+    >
+      OPEN TASK
+    </button>
+  )}
 
-  <button
-    className="secondary"
-    onClick={() => verifyTask(task.id)}
-  >
-    VERIFY
-  </button>
+  {task.completion_status === "pending" && (
+    <>
+      <button
+        className="secondary"
+        onClick={() => verifyTask(task.id)}
+      >
+        VERIFY
+      </button>
+    </>
+  )}
+
+  {task.completion_status === "completed" && (
+    <button
+      className="secondary"
+      disabled
+    >
+      COMPLETED ✓
+    </button>
+  )}
 </div>
           </section>
         );
