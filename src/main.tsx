@@ -420,7 +420,15 @@ if (result?.reward_event_type === "valued") {
 setAd((old) => (old + 1) % ads.length);
   } catch (error) {
     console.error("Ad event error:", error);
-    setMessage("Unable to start sponsored ad.");
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
+    console.error("Ad error details:", errorMessage);
+
+    setMessage(`Ad error: ${errorMessage}`);
   }
 }
   
