@@ -338,11 +338,19 @@ async function watchAd() {
       throw new Error("Ad tracking ID was not returned");
     }
 
-    const showAd = (window as any).show_11741797;
+const showAd = (window as any).show_11741797;
 
-    if (typeof showAd !== "function") {
-      throw new Error("Monetag ad SDK is not available");
-    }
+console.log(
+  "Monetag SDK check:",
+  typeof showAd,
+  (window as any).show_11741797
+);
+
+if (typeof showAd !== "function") {
+  throw new Error(
+    "Monetag SDK function missing. Check whether show_11741797 loaded."
+  );
+}
 
     setMessage("Loading sponsored ad...");
 
