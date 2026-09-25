@@ -8,13 +8,14 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
-    "react": "latest",
-    "react-dom": "latest"
-  },
+"dependencies": {
+  "@supabase/supabase-js": "^2.49.1",
+  "@vitejs/plugin-react": "latest",
+  "monetag-tg-sdk": "^1.0.4",
+  "vite": "latest",
+  "typescript": "latest",
+  "react": "latest",
+  "react-dom": "latest"
+},
   "devDependencies": {}
 }
