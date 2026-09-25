@@ -340,20 +340,6 @@ async function watchAd() {
       throw new Error("Ad tracking ID was not returned");
     }
 
-const showAd = (window as any).show_11741797;
-
-console.log(
-  "Monetag SDK check:",
-  typeof showAd,
-  (window as any).show_11741797
-);
-
-if (typeof showAd !== "function") {
-  throw new Error(
-    "Monetag SDK function missing. Check whether show_11741797 loaded."
-  );
-}
-
 setMessage("Loading sponsored ad...");
 
 await adHandler({
@@ -416,12 +402,8 @@ console.log("Monetag ad completed.");
       setMessage("Ad verified. Reward is being processed...");
     }
   }
-
-  if (!approved) {
-    setMessage("Ad verified. Reward is still processing.");
-  }
-} else {
-  setMessage("Ad completed, but no monetized reward was confirmed.");
+if (!approved) {
+  setMessage("Ad verified. Reward is still processing.");
 }
 
 setAd((old) => (old + 1) % ads.length);
