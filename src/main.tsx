@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import createAdHandler from "monetag-tg-sdk";
 import "./styles.css";
-
 type Tab = "home" | "earn" | "tasks" | "refer" | "wallet";
  type RewardTransaction = {
   id: string;
@@ -26,6 +26,8 @@ const ads = [
   { title: "Partner Campaign", reward: 35, time: "25 seconds" },
   { title: "Rewarded Placement", reward: 50, time: "30 seconds" }
 ];
+
+const adHandler = createAdHandler(11741797);
 
 function App() {
   const [tab, setTab] = useState<Tab>("home");
@@ -352,17 +354,14 @@ if (typeof showAd !== "function") {
   );
 }
 
-    setMessage("Loading sponsored ad...");
+setMessage("Loading sponsored ad...");
 
-    const result = await showAd({
-      type: "end",
-      ymid,
-      requestVar: "watch_ad",
-    });
+await adHandler({
+  ymid,
+  requestVar: "watch_ad",
+});
 
-console.log("Monetag ad result:", result);
-
-if (result?.reward_event_type === "valued") {
+console.log("Monetag ad completed.");
   setMessage("Ad verified. Checking reward...");
 
   let approved = false;
@@ -426,18 +425,18 @@ if (result?.reward_event_type === "valued") {
 }
 
 setAd((old) => (old + 1) % ads.length);
-  } catch (error) {
-    console.error("Ad event error:", error);
+} catch (error) {
+  console.error("Ad event error:", error);
 
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : String(error);
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : String(error);
 
-    console.error("Ad error details:", errorMessage);
+  console.error("Ad error details:", errorMessage);
 
-    setMessage(`Ad error: ${errorMessage}`);
-  }
+  setMessage(`Ad error: ${errorMessage}`);
+}
 }
   
 async function startTask(
