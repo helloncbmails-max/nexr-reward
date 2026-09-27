@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import createAdHandler from "monetag-tg-sdk";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 type Tab = "home" | "earn" | "tasks" | "refer" | "wallet";
@@ -360,19 +361,12 @@ async function watchAd() {
 
 setMessage("Loading sponsored ad...");
 
-const showAd = (window as any).show_11741797;
-
-if (typeof showAd !== "function") {
-  throw new Error(
-    "Monetag ad function is not available. Please reload the Mini App."
-  );
-}
+const showAd = createAdHandler("11741797");
 
 await showAd({
   ymid,
   requestVar: "watch_ad",
 });
-
 console.log("Monetag ad completed.");
   setMessage("Ad verified. Checking reward...");
 
