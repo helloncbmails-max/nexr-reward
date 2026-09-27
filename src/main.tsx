@@ -361,15 +361,19 @@ async function watchAd() {
 
 setMessage("Loading sponsored ad...");
 
-const showAd = createAdHandler("11741797");
+const showAd = (window as any).show_11741797;
+
+if (typeof showAd !== "function") {
+  throw new Error("Monetag direct SDK not loaded.");
+}
 
 await showAd({
   ymid,
   requestVar: "watch_ad",
 });
-console.log("Monetag ad completed.");
-  setMessage("Ad verified. Checking reward...");
 
+console.log("Monetag ad completed.");
+setMessage("Ad verified. Checking reward...");
   let approved = false;
 
   for (let attempt = 0; attempt < 10; attempt++) {
