@@ -17,9 +17,16 @@
 ></script>
 <script>
   window.addEventListener("load", function () {
+    const sdkStatus =
+      typeof window.show_11741797 === "function"
+        ? "LOADED"
+        : "NOT LOADED";
+
+    document.title = "Monetag SDK: " + sdkStatus;
+
     console.log(
       "NEXR Monetag direct check:",
-      typeof window.show_11741797
+      sdkStatus
     );
   });
 </script>
