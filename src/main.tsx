@@ -306,6 +306,27 @@ useEffect(() => {
   loadTasks();
 }, [tab]);
 
+useEffect(() => {
+  let attempts = 0;
+
+  const timer = window.setInterval(() => {
+    attempts += 1;
+
+    const loaded =
+      typeof (window as any).show_11741797 === "function";
+
+    if (loaded) {
+      setMessage("Monetag SDK: LOADED");
+      window.clearInterval(timer);
+    } else if (attempts >= 10) {
+      setMessage("Monetag SDK: NOT LOADED");
+      window.clearInterval(timer);
+    }
+  }, 1000);
+
+  return () => window.clearInterval(timer);
+}, []);
+
 async function watchAd() {
   setMessage("Creating secure ad session...");
 
