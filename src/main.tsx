@@ -329,7 +329,13 @@ useEffect(() => {
 }, []);
 
 async function watchAd() {
-  setMessage("Creating secure ad session...");
+  const sdkType = typeof (window as any).show_11741797;
+
+console.log("NEXR Monetag diagnostic:", sdkType);
+
+setMessage(`Monetag diagnostic: ${sdkType}`);
+return;
+setMessage("Creating secure ad session...");
 
   try {
     const initData = window.Telegram?.WebApp?.initData;
